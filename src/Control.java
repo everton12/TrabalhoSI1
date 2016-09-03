@@ -1,10 +1,12 @@
+import java.util.ArrayList;
+import java.util.List;
 
 public class Control {
 
-	private Integer [][] matriz;
+	private List<Integer> matriz;
 	
 	public Control(){
-		matriz = getTabuleiroRamdom();
+		matriz = getTabuleiroRandom();
 		algoritmo();
 		printGame();
 	}
@@ -19,20 +21,19 @@ public class Control {
 	}
 	
 	
-	public Integer [][] getTabuleiroRamdom(){
-		Integer [][] matrizAux = { {1,2,3}, {4,5,6}, {7,8, null}};
-		Integer [][] matriz = new Integer[3][3];
+	public ArrayList<Integer> getTabuleiroRandom(){
+		Integer [][] matrizAux = { {1,2,3}, {4,5,6}, {7,8, 0}};
+		ArrayList<Integer> matrizList = new ArrayList<Integer>();
 		
 		boolean isNull = true;
 		for (int i = 0; i < matrizAux.length; i++) {
 			for (int j = 0; j < matrizAux[i].length; j++) {
-				
 				while( isNull ){
 					int x = (int )(Math.random() * 3);
 					int y = (int )(Math.random() * 3);
 					
-					if(matriz[x][y]==null){
-						matriz[x][y] = matrizAux[i][j];
+					if(matrizList.contains(matrizAux[x][y])){
+						matrizList.add(matrizAux[i][j]);
 						isNull = false;
 					}
 				}
@@ -40,7 +41,9 @@ public class Control {
 			}
 		}
 		
-		return matriz;
+		
+		
+		return matrizList;
 	}
 	
 	
@@ -48,10 +51,15 @@ public class Control {
 		printMatriz(matriz);
 	}
 	
-	public void printMatriz(Integer [][] matriz){
-		System.out.println( (matriz[0][0]==null?" ":matriz[0][0]) + " | " + (matriz[0][1]==null?" ":matriz[0][1]) + " | " + (matriz[0][2]==null?" ":matriz[0][2]));
-		System.out.println( (matriz[1][0]==null?" ":matriz[1][0]) + " | " + (matriz[1][1]==null?" ":matriz[1][1]) + " | " + (matriz[1][2]==null?" ":matriz[1][2]));
-		System.out.println( (matriz[2][0]==null?" ":matriz[2][0]) + " | " + (matriz[2][1]==null?" ":matriz[2][1]) + " | " + (matriz[2][2]==null?" ":matriz[2][2]));
+	public void printMatriz(List<Integer> matriz){
+		for(int row = 0; row < 3; row++){
+			String rowString = "";
+			for(int column = 0; column < 3; column++){
+				Integer listValue = matriz.get((row*3 + column));
+				rowString+= (listValue > 0 ? listValue : " ") + "|";
+			}
+			System.out.println(rowString);
+		}
 	}
 	
 }
