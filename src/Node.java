@@ -1,21 +1,22 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
 	
-	protected List<Integer> matriz;
+	protected List<String> matriz;
 
-	public Node(List<Integer> matriz) {
+	public Node(List<String> matriz) {
 		this.matriz = matriz;
 	}
 	
-	public List<Integer> getMatriz() {
+	public List<String> getMatriz() {
 		return matriz;
 	}
 
 	public String getHash() {
 		String hash = "";
-		for(Integer integer : matriz){
-			hash+= integer + ",";
+		for(String String : matriz){
+			hash+= String + ",";
 		}
 		return hash;
 	}
