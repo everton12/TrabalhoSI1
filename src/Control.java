@@ -25,19 +25,16 @@ public class Control {
 		Integer [][] matrizAux = { {1,2,3}, {4,5,6}, {7,8, 0}};
 		ArrayList<Integer> matrizList = new ArrayList<Integer>();
 		
-		boolean isNull = true;
 		for (int i = 0; i < matrizAux.length; i++) {
 			for (int j = 0; j < matrizAux[i].length; j++) {
-				while( isNull ){
+				while(matrizList.size() < 9){
 					int x = (int )(Math.random() * 3);
 					int y = (int )(Math.random() * 3);
 					
-					if(matrizList.contains(matrizAux[x][y])){
-						matrizList.add(matrizAux[i][j]);
-						isNull = false;
+					if(!matrizList.contains(matrizAux[x][y])){
+						matrizList.add(matrizAux[x][y]);
 					}
 				}
-				isNull = true;
 			}
 		}
 		
