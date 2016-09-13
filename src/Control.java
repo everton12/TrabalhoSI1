@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class Control {
 		
 		checkedNodes.put(atualNode.getHash(), atualNode);
 		
-		while(verifyFinalNode(atualNode) || verifyCheckedNode(atualNode)){
+		while(verifyFinalNode(atualNode)){
 			useHeuristicToMove();
 		}
 	}
@@ -43,25 +44,22 @@ public class Control {
 
 
 	public Node getRandomNode(){
-		String [][] matrizAux = { {"1","2","3"}, {"4","5","6"}, {"7","8","0"}};
-		ArrayList<String> matrizList = new ArrayList<String>();
+		ArrayList<String> matrizList = new ArrayList<String>(Arrays.asList("1","2","3","4","5","6","7","8","0"));
+		Node randomNode = new Node(matrizList);
 		
-		for (int i = 0; i < matrizAux.length; i++) {
-			for (int j = 0; j < matrizAux[i].length; j++) {
-				while(matrizList.size() < 9){
-					int x = (int )(Math.random() * 3);
-					int y = (int )(Math.random() * 3);
-					
-					if(!matrizList.contains(matrizAux[x][y])){
-						matrizList.add(matrizAux[x][y]);
-					}
-				}
+		for(int index = 0; index < 50; index++){
+			Integer enumNodeCode = (int )(Math.random() * 4);
+			
+			List<Integer> possibles = getPossibleMoves(randomNode.getMatriz().indexOf("0")/3, randomNode.getMatriz().indexOf("0")%3);
+			
+			if(possibles.contains(enumNodeCode)){
+				randomNode = getMoveByEnum(MoveEnum.get(enumNodeCode), randomNode);
 			}
 		}
 		
-		Node node = new Node(matrizList);
-		printMatriz(node);
-		return node;
+		printMatriz(randomNode);
+		
+		return randomNode;
 	}
 	
 	public Node moveLeftPosition(List<String> matriz){
@@ -98,17 +96,18 @@ public class Control {
 		System.out.println("up");
 		int availablePosition = matriz.indexOf("0");
 		
-		int row = availablePosition/3; //0 a 2
-		int column = availablePosition%3; //0 a 2
-		if(row == 1 || row == 2){
-			int movedIndex = ((row-1)*3)+column;
-			int newIndex = ((row*3)+column);
+		int rowAvailable = availablePosition/3; //0 a 2
+		if(rowAvailable == 1 || rowAvailable == 2){
+			String[][] matrizArray = new String[3][3];
+			for(String position : matriz){
+				int rowAdd = availablePosition/3; //0 a 2
+				int columnAdd = availablePosition%3; //0 a 2
+				
+				matrizArray[rowAdd][columnAdd] = position;
+			}
 			
-			String movedPosition = matriz.get(movedIndex);
-			matriz.add(newIndex, movedPosition);
-			matriz.remove("0");
-			matriz.add(movedIndex, "0");
-			matriz.remove(movedIndex+1);
+			int indexValue = rowAvailable - 1;
+			
 		}
 		
 		Node node = new Node(matriz);
@@ -144,6 +143,38 @@ public class Control {
 		int rowEmptyPosition = emptyPosition/3;
 		
 		List<Integer> possibleMoves = getPossibleMoves(rowEmptyPosition, columnEmptyPosition);
+		
+		Node nodeToMove = null;
+		
+		for(Integer index : possibleMoves){
+			Node node = getMoveByEnum(MoveEnum.get(index), atualNode);
+			if(!verifyCheckedNode(node)){
+				if(nodeToMove == null || nodeToMove.getPunctuation() < node.getPunctuation()){
+					nodeToMove = node;
+				}
+			}
+		}
+		
+		if(nodeToMove != null){
+			atualNode = nodeToMove;
+			checkedNodes.put(atualNode.getHash(), atualNode);
+			printMatriz(atualNode);
+		}
+	}
+	
+	private Node getMoveByEnum(MoveEnum move, Node node){
+		Node nodeReturn = null;
+		if(move == MoveEnum.UP){
+			nodeReturn = moveUpPosition(node.getMatriz());
+		} else if(move == MoveEnum.DOWN){
+			nodeReturn = moveUpPosition(node.getMatriz());
+		} else if(move == MoveEnum.LEFT){
+			nodeReturn = moveUpPosition(node.getMatriz());
+		} else if(move == MoveEnum.RIGHT){
+			nodeReturn = moveUpPosition(node.getMatriz());
+		}
+		
+		return nodeReturn;
 	}
 
 	private List<Integer> getPossibleMoves(int rowEmptyPosition, int columnEmptyPosition) {
@@ -153,37 +184,16 @@ public class Control {
 			possibleMoves.add(MoveEnum.UP);
 		}
 		
-//		if(rowEmptyPosition < 2){
-//			possibleMoves.add(MoveEnum.DOWN);
-//		}
-//		
-//		if(columnEmptyPosition > 0){
-//			possibleMoves.add(MoveEnum.LEFT);
-//		}
-//		
-//		if(columnEmptyPosition < 2){
-//			possibleMoves.add(MoveEnum.RIGHT);
-//		}
+		if(rowEmptyPosition < 2){
+			possibleMoves.add(MoveEnum.DOWN);
+		}
 		
-//		List<Integer> movePositions = new ArrayList<Integer>();
-//		
-//		for(Integer position : movePositions){
-//			int column = position%3;
-//			int row = position/3;
-//		}
+		if(columnEmptyPosition > 0){
+			possibleMoves.add(MoveEnum.LEFT);
+		}
 		
-		if(possibleMoves.size() > 0){
-			MoveEnum move = possibleMoves.get(0);
-			
-			if(move == MoveEnum.UP){
-				atualNode = moveUpPosition(atualNode.getMatriz());
-			} else if(move == MoveEnum.DOWN){
-				atualNode = moveDownPosition(atualNode.getMatriz());
-			} else if(move == MoveEnum.RIGHT){
-				atualNode = moveRightPosition(atualNode.getMatriz());
-			} else if(move == MoveEnum.LEFT){
-				atualNode = moveLeftPosition(atualNode.getMatriz());
-			}
+		if(columnEmptyPosition < 2){
+			possibleMoves.add(MoveEnum.RIGHT);
 		}
 		
 		return new ArrayList<Integer>();
