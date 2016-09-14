@@ -49,6 +49,25 @@ public class Node {
 		return true;
 	}
 	
+	public int getPunctuation() {
+		int score = 0;
+		
+		for(String value : matriz){
+			Integer positionOfObjectiveNode = Integer.valueOf(value)-1;
+			Integer positionAtual = matriz.indexOf(value);
+			
+			int objectiveCol = positionOfObjectiveNode%3;
+			int objectiveRow = positionOfObjectiveNode/3;
+			
+			int atualCol = positionAtual%3;
+			int atualRow = positionAtual/3;
+			
+			score+= (objectiveCol - atualCol)*(objectiveCol - atualCol);
+			score+= (objectiveRow - atualRow)*(objectiveRow - atualRow);
+		}
+		return score;
+	}
+	
 	
 	
 }

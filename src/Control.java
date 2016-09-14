@@ -19,16 +19,12 @@ public class Control {
 	
 	public void initializeControls(){
 		checkedNodes = new LinkedHashMap<String, Node>();
-		nodosEscolhidos = new LinkedHashMap<String, Node>();
-		
-		///vamos utilizar um embaralhamento inicial default somente enquanto desenvolvemos
-		///quando for pra fazer os testes finais, nós perdemos tempo com a criação do random e tal
-		ArrayList<String> initialNode = new ArrayList<String>(Arrays.asList("2", "3", "6", "1", "8", "0", "4", "5", "7"));
-		atualNode = new Node(initialNode);
+//		finalNodes = new LinkedHashMap<String, Node>();
+		atualNode = getRandomNode();
 		
 		checkedNodes.put(atualNode.getHash(), atualNode);
 		
-		while(verifyFinalNode(atualNode) || verifyCheckedNode(atualNode)){
+		while(verifyFinalNode(atualNode)){
 			useHeuristicToMove();
 		}
 	}
@@ -50,28 +46,24 @@ public class Control {
 	}
 
 
-	///tem erros no conceito desse algoritmo, aquilo que comentei contigo pelo whats
-//	public Node getRandomNode(){
-//		String [][] matrizAux = { {"1","2","3"}, {"4","5","6"}, {"7","8","0"}};
-//		ArrayList<String> matrizList = new ArrayList<String>();
-//		
-//		for (int i = 0; i < matrizAux.length; i++) {
-//			for (int j = 0; j < matrizAux[i].length; j++) {
-//				while(matrizList.size() < 9){
-//					int x = getRandomNumber(3);
-//					int y = getRandomNumber(3);
-//					
-//					if(!matrizList.contains(matrizAux[x][y])){
-//						matrizList.add(matrizAux[x][y]);
-//					}
-//				}
-//			}
-//		}
-//		
-//		Node node = new Node(matrizList);
-//		printMatriz(node);
-//		return node;
-//	}
+	public Node getRandomNode(){
+		ArrayList<String> matrizList = new ArrayList<String>(Arrays.asList("1","2","3","4","5","6","7","8","0"));
+		Node randomNode = new Node(matrizList);
+		
+		for(int index = 0; index < 50; index++){
+			Integer enumNodeCode = (int )(Math.random() * 4);
+			
+			List<Integer> possibles = getPossibleMoves(randomNode.getMatriz().indexOf("0")/3, randomNode.getMatriz().indexOf("0")%3);
+			
+			if(possibles.contains(enumNodeCode)){
+				randomNode = getMoveByEnum(MoveEnum.get(enumNodeCode), randomNode);
+			}
+		}
+		
+		printMatriz(randomNode);
+		
+		return randomNode;
+	}
 	
 	
 	///ok move o espaço vazio para a esquerda
@@ -87,7 +79,7 @@ public class Control {
 		}
 		
 		Node node = new Node(matriz);
-		printMatriz(node);
+//		printMatriz(node);
 		return node;
 	}
 	
@@ -105,7 +97,7 @@ public class Control {
 		}
 		
 		Node node = new Node(matriz);
-		printMatriz(node);
+//		printMatriz(node);
 		return node;
 	}
 	
@@ -122,7 +114,7 @@ public class Control {
 		}
 		
 		Node node = new Node(matriz);
-		printMatriz(node);
+//		printMatriz(node);
 		return node;
 	}
 	
@@ -139,7 +131,7 @@ public class Control {
 		}
 		
 		Node node = new Node(matriz);
-		printMatriz(node);
+//		printMatriz(node);
 		return node;
 	}
 	
@@ -164,13 +156,43 @@ public class Control {
 		int emptyPosition = atualNode.getMatriz().indexOf("0");
 		int columnEmptyPosition = emptyPosition%3;
 		int rowEmptyPosition = emptyPosition/3;
-		System.out.println("  >>>  " + emptyPosition +" "+ columnEmptyPosition + " " + rowEmptyPosition);
 		
-		List<MoveEnum> possibleMoves = getPossibleMoves(rowEmptyPosition, columnEmptyPosition);
+		List<Integer> possibleMoves = getPossibleMoves(rowEmptyPosition, columnEmptyPosition);
+		
+		Node nodeToMove = null;
+		
+		for(Integer index : possibleMoves){
+			Node node = getMoveByEnum(MoveEnum.get(index), atualNode);
+			if(!verifyCheckedNode(node)){
+				if(nodeToMove == null || nodeToMove.getPunctuation() < node.getPunctuation()){
+					nodeToMove = node;
+				}
+			}
+		}
+		
+		if(nodeToMove != null){
+			atualNode = nodeToMove;
+			checkedNodes.put(atualNode.getHash(), atualNode);
+			printMatriz(atualNode);
+		}
 	}
 	
-	//ok, esta pegando as possiblesMoves, só não tá retornando nada 
-	private List<MoveEnum> getPossibleMoves(int rowEmptyPosition, int columnEmptyPosition) {
+	private Node getMoveByEnum(MoveEnum move, Node node){
+		Node nodeReturn = null;
+		if(move == MoveEnum.UP){
+			nodeReturn = moveUpPosition(node.getMatriz());
+		} else if(move == MoveEnum.DOWN){
+			nodeReturn = moveUpPosition(node.getMatriz());
+		} else if(move == MoveEnum.LEFT){
+			nodeReturn = moveUpPosition(node.getMatriz());
+		} else if(move == MoveEnum.RIGHT){
+			nodeReturn = moveUpPosition(node.getMatriz());
+		}
+		
+		return nodeReturn;
+	}
+
+	private List<Integer> getPossibleMoves(int rowEmptyPosition, int columnEmptyPosition) {
 		List<MoveEnum> possibleMoves = new ArrayList<MoveEnum>();
 		
 		if(rowEmptyPosition > 0){
@@ -189,45 +211,12 @@ public class Control {
 			possibleMoves.add(MoveEnum.RIGHT);
 		}
 		
-		for(MoveEnum position : possibleMoves){
-			System.out.println(position.getType());
+		ArrayList<Integer> moves = new ArrayList<Integer>();
+		for (int i = 0; i < possibleMoves.size(); i++) {
+			moves.add(possibleMoves.get(i).getType());
 		}
 		
-//		List<Integer> movePositions = new ArrayList<Integer>();
-		
-//		for(Integer position : movePositions){
-//			int column = position%3;
-//			int row = position/3;
-//		}
-		
-		if(possibleMoves.size() > 0){
-			MoveEnum move = possibleMoves.get(0);
-			
-			if( possibleMoves.contains(MoveEnum.LEFT) ){
-				atualNode = moveLeftPosition(atualNode.getMatriz());
-			}else{
-				if(move == MoveEnum.UP){
-					atualNode = moveUpPosition(atualNode.getMatriz());
-				} else if(move == MoveEnum.DOWN){
-					atualNode = moveDownPosition(atualNode.getMatriz());
-				} else if(move == MoveEnum.RIGHT){
-					atualNode = moveRightPosition(atualNode.getMatriz());
-				} else if(move == MoveEnum.LEFT){
-					atualNode = moveLeftPosition(atualNode.getMatriz());
-				}
-			}
-			
-		}
-		
-//		return new ArrayList<Integer>();
-		return possibleMoves;
-	}
-	
-	//TODO
-	public int getHeuristicPunctuation(Node node_to_get){
-		
-		
-		return 0;
+		return moves;
 	}
 	
 	public boolean isObjectiveNode(Node node){
