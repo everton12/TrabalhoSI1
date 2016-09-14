@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
 
 public class Control {
 
@@ -19,12 +20,9 @@ public class Control {
 	
 	public void initializeControls(){
 		checkedNodes = new LinkedHashMap<String, Node>();
-//		finalNodes = new LinkedHashMap<String, Node>();
 		atualNode = getRandomNode();
 		
-		checkedNodes.put(atualNode.getHash(), atualNode);
-		
-		while(verifyFinalNode(atualNode)){
+		while(!verifyFinalNode(atualNode)){
 			useHeuristicToMove();
 		}
 	}
@@ -35,14 +33,16 @@ public class Control {
 
 
 	private boolean verifyFinalNode(Node atualNode2) {
+		boolean isFinalNode = true;
 		List<String> auxList = new ArrayList<String>(atualNode2.getMatriz());
 		auxList.remove(auxList.indexOf("0"));
 		for(String nodePosition : auxList){
-			if(!nodePosition.equals(((auxList.indexOf(nodePosition + "")+1)))){
+			if(!Integer.valueOf(nodePosition).equals(((auxList.indexOf(nodePosition)+1)))){
+				isFinalNode = false;
 				break;
 			}
 		}
-		return false;
+		return isFinalNode;
 	}
 
 
@@ -50,8 +50,10 @@ public class Control {
 		ArrayList<String> matrizList = new ArrayList<String>(Arrays.asList("1","2","3","4","5","6","7","8","0"));
 		Node randomNode = new Node(matrizList);
 		
-		for(int index = 0; index < 50; index++){
-			Integer enumNodeCode = (int )(Math.random() * 4);
+		Random gerador = new Random();
+		 
+		for(int index = 0; index < 500; index++){
+			Integer enumNodeCode = new Integer(gerador.nextInt(3));
 			
 			List<Integer> possibles = getPossibleMoves(randomNode.getMatriz().indexOf("0")/3, randomNode.getMatriz().indexOf("0")%3);
 			
@@ -66,9 +68,8 @@ public class Control {
 	}
 	
 	
-	///ok move o espaço vazio para a esquerda
+	///ok move o espaï¿½o vazio para a esquerda
 	public Node moveLeftPosition(List<String> matriz){
-		System.out.println("left");
 		int availablePosition = matriz.indexOf("0");
 		
 		//0|1|2
@@ -84,9 +85,8 @@ public class Control {
 	}
 	
 	
-	//ok ///move o espaço vazio para a direita
+	//ok ///move o espaï¿½o vazio para a direita
 	public Node moveRightPosition(List<String> matriz){
-		System.out.println("right");
 		int availablePosition = matriz.indexOf("0");
 		
 		//0|1|2
@@ -104,7 +104,6 @@ public class Control {
 	
 	///OK
 	public Node moveUpPosition(List<String> matriz){
-		System.out.println("up");
 		int availablePosition = matriz.indexOf("0");
 		
 		int row = availablePosition/3; //1 a 2
@@ -121,7 +120,6 @@ public class Control {
 	
 	///OK
 	public Node moveDownPosition(List<String> matriz){
-		System.out.println("down");
 		int availablePosition = matriz.indexOf("0");
 		
 		int row = availablePosition/3; //0 a 2
@@ -135,7 +133,7 @@ public class Control {
 		return node;
 	}
 	
-	//ok ///Criado pq a forma de trocas os elementos do array é feito da mesma maneira pra todas as movimentações
+	//ok ///Criado pq a forma de trocas os elementos do array ï¿½ feito da mesma maneira pra todas as movimentaï¿½ï¿½es
 	public List<String> move( List<String> matriz, int availablePosition, int idx_to_move ){
 		String valid_item_to_move = matriz.get(idx_to_move);
 		
@@ -182,11 +180,11 @@ public class Control {
 		if(move == MoveEnum.UP){
 			nodeReturn = moveUpPosition(node.getMatriz());
 		} else if(move == MoveEnum.DOWN){
-			nodeReturn = moveUpPosition(node.getMatriz());
+			nodeReturn = moveDownPosition(node.getMatriz());
 		} else if(move == MoveEnum.LEFT){
-			nodeReturn = moveUpPosition(node.getMatriz());
+			nodeReturn = moveLeftPosition(node.getMatriz());
 		} else if(move == MoveEnum.RIGHT){
-			nodeReturn = moveUpPosition(node.getMatriz());
+			nodeReturn = moveRightPosition(node.getMatriz());
 		}
 		
 		return nodeReturn;
